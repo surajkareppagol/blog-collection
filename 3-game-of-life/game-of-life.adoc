@@ -1,0 +1,172 @@
+= ⚙️ Game of Life
+:source-highlighter: rouge
+:nofooter:
+:icons: font
+
+What is `Game of Life`? In simpler words Game of Life is a model of
+computation. A model of computation describes how a output value to be
+calculated given an input.
+
+image::https://upload.wikimedia.org/wikipedia/commons/e/e5/Gospers_glider_gun.gif[Game of Life Example, align="center"]
+
+NOTE: The content is primarily sourced from https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life[Wikipedia].
+
+Game of Life is also called as `Conway's Game of Life`, as it was _invented by
+the British mathematician John Horton Conway in 1970_.
+
+== 👾 Rules of Game of Life
+
+Game of Life is a *zero player* game, meaning that it depends only on the
+initial state or configuration without needing any further inputs. Game of Life
+has a environment called as universe. It is an infinite, two dimensional
+orthogonal grid of square `cells`. Each cell could be one of the two possible
+states, live or dead (On or Off).
+
+As the game proceeds _every cell interacts with its eight neighbor cells_. These
+are cells which are immediately attached to the original cell. Each interaction
+results in one of these transitions:
+
+* Any live cell with fewer than two live neighbors dies, as if by
+under-population.
+* Any live cell with two or three live neighbors lives on to the next
+generation.
+* Any live cell with more than three live neighbors dies, as if by
+overpopulation.
+* Any dead cell with exactly three live neighbors becomes a live cell, as if by
+reproduction.
+
+The initial configuration or pattern is the `seed` of the system. New
+generations of cells are created by applying the above rules to each and every
+cell. The discrete movement in which it occurs is called as `tick`.
+
+== 👨‍💻 Programming Game of Life in C Language
+
+The below program is the implementation of Game of Life in C Language.
+
+NOTE: The implementation is from https://rosettacode.org[Rosetta code].
+
+The values `width` and `height` are essential, as these values will decide the
+universe size.
+
+[source, c]
+----
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+void show(void *universe_pre, int width, int height);
+void evolve(void *universe_pre, int width, int height);
+void game(int width, int height);
+
+int main(int argc, char **argv) {
+  int width = 0, height = 0;
+
+  if (argc > 1) {
+    width = atoi(argv[1]);
+  }
+
+  if (argc > 2) {
+    height = atoi(argv[2]);
+  }
+
+  if (width <= 0) {
+    width = 30;
+  }
+
+  if (height <= 0) {
+    height = 30;
+  }
+
+  game(width, height);
+
+  return 0;
+}
+----
+
+The `game()` function will do the initial configuration and will call the
+`evolve()` function continuously.
+
+[source, c]
+----
+void game(int width, int height) {
+  unsigned universe[height][width];
+
+  for (int i = 0; i < width; i++) {
+    for (int j = 0; j < height; j++) {
+      /* Initial configuration */
+      universe[j][i] = rand() < RAND_MAX / 10 ? 1 : 0;
+    }
+  }
+
+  while (1) {
+    show(universe, width, height);
+    evolve(universe, width, height);
+    usleep(200000);
+  }
+}
+----
+
+The `show()` function loops over the universe and displays the status of each
+cell, that is live or dead. For this implementation ANSI escape sequences are
+being used.
+
+[source, c]
+----
+void show(void *universe_pre, int width, int height) {
+  int(*universe)[width] = universe_pre;
+
+  printf("\033[H");
+
+  for (int i = 0; i < height; i++) {
+    for (int j = 0; j < width; j++) {
+      printf(universe[i][j] ? "\033[07m \033[m" : "  ");
+    }
+
+    printf("\033[E");
+  }
+
+  fflush(stdout);
+}
+----
+
+The `evolve()` function is responsible for generating the next generation of
+cells based on the previous generation. Although this is a minimal implementation
+of `Game of Life`, there are many variations.
+
+[source, c]
+----
+void evolve(void *universe_pre, int width, int height) {
+  unsigned(*universe)[width] = universe_pre;
+  unsigned universe_next[height][width];
+
+  for (int i = 0; i < height; i++) {
+    for (int j = 0; j < width; j++) {
+      int steps = 0;
+
+      for (int x = i - 1; x <= i + 1; x++) {
+        for (int y = j - 1; y <= j + 1; y++) {
+          if (universe[(x + height) % height][(y + width) % width]) {
+            steps++;
+          }
+        }
+      }
+
+      if (universe[i][j]) {
+        steps--;
+      }
+
+      universe_next[i][j] = (steps == 3 || (steps == 2 && universe[i][j]));
+    }
+  }
+
+  for (int i = 0; i < height; i++) {
+    for (int j = 0; j < width; j++) {
+      universe[i][j] = universe_next[i][j];
+    }
+  }
+}
+----
+
+## 🚀 Conclusion
+
+This is a introductory blog on `Conway's Game of Life`. Please visit https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life[Wikipedia] for more info.
