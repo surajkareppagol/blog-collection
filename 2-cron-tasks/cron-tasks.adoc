@@ -1,0 +1,75 @@
+= ⚙️ Introduction to Cron
+:source-highlighter: rouge
+:nofooter:
+
+What is Cron? `Cron` is a command line program/utility that is used to schedule
+jobs. Along with this Cron is also a job scheduler/task scheduler. It helps to
+automate the process of executing tasks repeatedly. The jobs are the tasks which
+are other programs or shell commands.
+
+For example, if a user wants to automate the process of updating his/her laptop
+with `apt update && apt upgrade`, they can do it via cron. Cron is very flexible
+the tasks could be scheduled in terms of _minutes, hours, days, weeks, months
+and years_. For example, update the laptop every day on 12:00.
+
+Cron is most suitable for scheduling repetitive tasks.
+
+> Cron's name originates from `Chronos`, the Greek word for time.
+
+== 🤔 How to use it?
+
+Cron works via a configuration file called as `Crontab` (Cron Table). This
+configuration file specifies the shell commands that needs to be scheduled.
+
+Each line of a `Crontab` file represents a job. Here is an example of config
+file from https://en.wikipedia.org/wiki/Cron[Wikipedia].
+
+[source, sh]
+----
+# * * * * * <command to execute>
+# | | | | |
+# | | | | day of the week (0–6) (Sunday to Saturday; 
+# | | | month (1–12)             7 is also Sunday on some systems)
+# | | day of the month (1–31)
+# | hour (0–23)
+# minute (0–59)
+----
+
+* `*` - Represents minute (0 - 59)
+* `*` - Represents hour (0 - 23)
+* `*` - Represents day of the month (1 - 31)
+* `*` - Represents month (1 - 12)
+* `*` - Represents the day of the week (0 - 6), Sunday to Saturday
+
+The syntax for cron-expression excepts five fields, which describe the time and
+date and followed by the shell command.
+
+For example, assuming that default shell for the user is `Bash`, this below
+cron-expression will _execute the command `echo` at *12:10* every day_.
+
+[source, sh]
+----
+10 12 * * * echo "Terminal"
+----
+
+A much complex example would be something like this,
+
+[source, sh]
+----
+10 12 2 2 * cal
+----
+
+The above cron-expression will _execute the command `cal`, after every second
+month, second day of the month, at *12:10*_.
+
+The below command is used to edit the user configuration file regardless of
+where the file is stored.
+
+[source, sh]
+----
+crontab -e
+----
+
+== 🚀 Conclusion
+
+This was an introductory blog for `Cron`. Please visit the https://en.wikipedia.org/wiki/Cron[Wikipedia] or run `man crontab` on command-line for more info.
