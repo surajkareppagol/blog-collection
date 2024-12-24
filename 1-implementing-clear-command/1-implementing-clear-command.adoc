@@ -1,0 +1,79 @@
+= Implementation of clear command!
+:source-highlighter: rouge
+:nofooter:
+:icons: font
+
+`Clear` command is one of the most used command. The description of `Clear`
+command from the `man page`,
+
+[quote, clear]
+----
+clear clears your terminal's screen and its scrollback buffer, if any. clear
+retrieves the terminal type from the environment variable TERM, then consults
+the terminfo terminal capability database entry for that type to determine how
+to perform these actions.
+----
+
+This command can be implemented in *two* ways!
+
+== Using `newlines` escape sequence!
+
+This method uses `newline` escape sequence to clear the screen. This behavior
+is similar to `CTRL + L` keybinding.
+
+But how many newline characters? The answer depends on the terminal window size.
+If the total rows are _20_, then _20 + 20_ newline characters. The terminal size
+can be obtained easily using libraries such as ncurses. But here let's use
+`winsize` structure from `unistd.h` as explained in this 
+https://stackoverflow.com/questions/1022957/getting-terminal-width-in-c[stackoverflow] page.
+
+[source, c]
+----
+#include <stdio.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+
+int main (int argc, char **argv)
+{
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
+    for (int i = 0; i < w.ws_row + 10; i++) {
+        printf("\n");
+    }
+
+    return 0;
+}
+----
+
+Here `winsize` has two members `ws_row` and `ws_col`. After the `ioctl` call
+this structure is populated with row and column values.
+
+Once the number of rows are available just loop over and print newline
+characters.
+
+== Using `ANSI` escape sequence
+
+Yes, `\n` was a escape sequence but there are other escape sequences which are
+available for the terminal manipulation. One such escape sequence that could be
+used to clear the screen is `ESC[2J`. Here `ESC` is the escape sequence code
+which could be `\033` or \0x1B`.
+
+[source, c]
+----
+#include <stdio.h>
+
+int main(int argc, char **argv) {
+    printf("\033[2J");
+    return 0;
+}
+----
+
+Although this works in `Gnome Terminal` it might not work in other terminals.
+Also the cursor doesn't move back to home location that is `0, 0` to achieve
+this one more escape sequence could be used that is `\033[H`.
+
+== Conclusion
+
+Although these two approaches work but these are not portable to all the
+terminals. But this gives an idea about the implementation of the `clear` command.
