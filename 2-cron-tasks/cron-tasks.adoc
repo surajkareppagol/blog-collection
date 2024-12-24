@@ -72,4 +72,5 @@ crontab -e
 
 == 🚀 Conclusion
 
-This was an introductory blog for `Cron`. Please visit the https://en.wikipedia.org/wiki/Cron[Wikipedia] or run `man crontab` on command-line for more info.
+This is an introductory blog for `Cron`. Please visit https://en.wikipedia.org/wiki/Cron[Wikipedia]
+or run `man crontab` on command-line for more info.
