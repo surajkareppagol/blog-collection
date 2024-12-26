@@ -1,0 +1,125 @@
+= 🐙 GitHub - SSH Key Generation
+:source-highlighter: rouge
+:nofooter:
+
+Password authentication was removed from GitHub on August 13, 2021. Instead of
+that users now need to use PAT(Personal Access Token) instead. `SSH
+(Secure Shell Protocol)`. These tokens are used instead of passwords. For a new
+user using SSH tokens may be overwhelming, GitHub has a detailed blog: https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent[Generating a new SSH key and adding it to the ssh-agent].
+
+== 🔐 How to generate the SSH token?
+
+What is SSH?
+
+> The Secure Shell Protocol (SSH) is a cryptographic network protocol for
+> operating network services securely over an unsecured network. Its most
+> notable applications are remote login and command-line execution.
+
+Before generating the token the following packages needs to be installed on the
+system.
+
+[source, sh]
+----
+sudo apt install ssh
+sudo apt install openssh-client
+sudo apt install openssh-server
+----
+
+After installing these packages open the terminal and execute the following
+command.
+
+[source, sh]
+----
+ssh-keygen -t ed25519 -C "your_email@example.com"
+----
+
+This command generates the SSH token on the local machine with the provided
+email as label.
+
+[source, sh]
+----
+> Generating public/private ALGORITHM key pair.
+
+> Enter a file in which to save the key (/home/YOU/.ssh/id_ALGORITHM):[Press enter]
+----
+
+On this prompt press enter as this will create the file at the default location.
+
+[source, sh]
+----
+> Enter passphrase (empty for no passphrase): [Type a passphrase]
+> Enter same passphrase again: [Type passphrase again]
+----
+
+Enter your secret passphrase, remember twice. This is the first stage of SSH
+key setup. Once key is generated it needs to be added to a ssh-agent. But why?
+
+----
+If your key has a passphrase and you don't want to enter the passphrase every
+time you use the key, you can add your key to the `SSH agent`. The SSH agent
+manages your SSH keys and remembers your passphrase.
+----
+
+The `SSH agent` is started using the following command. This command will return
+the `pid`.
+
+[source, sh]
+----
+eval "$(ssh-agent -s)"
+----
+
+Once the `SSH agent` is started, the ssh key is added using the following
+command. This command prompts for the passphrase that was used during ssh key
+generation, enter that passphrase.
+
+[source, sh]
+----
+ssh-add ~/.ssh/id_ed25519
+----
+
+== 🔑 Adding SSH key to GitHub account
+
+Generated SSH key gen could be added to GitHub account. But what key to add?
+Remember SSH has private and public keys. The local machine contains the private
+key, that only the machine on which it was generated knows and for
+authentication the public key needs to be added to the GitHub account.
+
+The following command displays the public key. Copy the text that appears after
+this command, don't copy any whitespace after the end.
+
+[source, sh]
+----
+cat ~/.ssh/id_ed25519.pub
+----
+
+Once the key is copied, go to GitHub and follow the steps as mentioned,
+
+* Open settings and click on `SSH and GPG Keys` option.
+* Click on `New SSH key` or `Add SSH Key`.
+* Add title, it should be descriptive, like local machine etc.
+* Paste the copied SSH public key and click on `Add SSH Key`.
+
+Once these steps are completed the process of generating and adding new ssh key
+to the GitHub account is done.
+
+== ✅ How to use it?
+
+When cloning the repository make sure to select the `SSH` and not `HTTPS`.
+`HTTPS` link starts with `https://github.com` and `SSH` link starts with
+`git@github.com:`.
+
+[source, sh]
+----
+git clone git@github.com:github/github.git
+----
+
+It will prompt for the SSH passphrase which was used when generating the ssh
+keys.
+
+== 🚀 Conclusion
+
+This is a quick guide into how to generate and add the SSH key to GitHub
+account. The same generated key could be used for other services such as`GitLab`
+and others.
+
+For more detailed info please visit: https://docs.github.com/en/authentication/connecting-to-github-with-ssh[Connecting to GitHub with SSH]
