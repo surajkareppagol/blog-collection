@@ -1,4 +1,4 @@
-= Implementation of clear command!
+= 🐧 Implementation of clear command
 :source-highlighter: rouge
 :nofooter:
 :icons: font
